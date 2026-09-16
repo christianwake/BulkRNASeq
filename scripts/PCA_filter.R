@@ -6,19 +6,19 @@ library('GenomicRanges')
 library('dplyr')
 library('ggrepel')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 if(interactive()){
   project <- '2021612_finch'
   #project <- '2022612_Petrovas'
   qc_name <- '2023-12-06'
-  count_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/counts/normalizedCounts.txt')
-  covs_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_intermediate.csv')
-  qc_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/QC_steps/Sample_and_feature_filters.csv')
-  covs_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
-  out_pdf <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/PCA_filter.pdf')
-  out_csv <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
+  count_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/counts/normalizedCounts.txt')
+  covs_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_intermediate.csv')
+  qc_file <- paste0('/home/cwake/projects/', project, '/QC_steps/Sample_and_feature_filters.csv')
+  covs_out <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
+  out_pdf <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/PCA_filter.pdf')
+  out_csv <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
   
 } else{
   args = commandArgs(trailingOnly=TRUE)

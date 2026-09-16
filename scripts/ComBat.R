@@ -6,18 +6,18 @@ library('GenomicRanges')
 library('dplyr')
 library('readr')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 if(interactive()){
   #project <- '2021612_finch'
   project <- '2022612_Petrovas'
-  count_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/counts/normalizedCounts.txt')
-  dds_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/counts/normalizedCounts.RDS')
-  covs_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/Covariates_QC_metrics_filter.csv')
-  batch_info <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/batch_evaluation.txt')
-  count_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/counts/finalCounts.txt')
-  dds_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/counts/finalCounts.RDS')
+  count_in <- paste0('/home/cwake/projects/', project, '/data/counts/normalizedCounts.txt')
+  dds_in <- paste0('/home/cwake/projects/', project, '/data/counts/normalizedCounts.RDS')
+  covs_in <- paste0('/home/cwake/projects/', project, '/data/Covariates_QC_metrics_filter.csv')
+  batch_info <- paste0('/home/cwake/projects/', project, '/data/batch_evaluation.txt')
+  count_out <- paste0('/home/cwake/projects/', project, '/data/counts/finalCounts.txt')
+  dds_out <- paste0('/home/cwake/projects/', project, '/data/counts/finalCounts.RDS')
 } else{
   args = commandArgs(trailingOnly=TRUE)
   count_in <- args[1]

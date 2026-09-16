@@ -5,8 +5,8 @@ library('stringr')
 library('GenomicRanges')
 library('dplyr')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 print(sessionInfo())
 
 if(interactive()){
@@ -21,12 +21,12 @@ if(interactive()){
   # batch <- ''
   # qc_name <- 'QC3'
   # 
-  count_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/counts/filteredCounts.txt')
-  covs_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/Covariates_QC_metrics_intermediate.csv')
-  #covs_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
-  norm_file  <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/Treatment/normalizedCounts.txt')
-  dds_file  <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/Treatment/normalizedCounts.RDS')
-  pdf_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/normalization.pdf')
+  count_file <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/counts/filteredCounts.txt')
+  covs_file <- paste0('/home/cwake/projects/', project, '/data/Covariates_QC_metrics_intermediate.csv')
+  #covs_file <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
+  norm_file  <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/Treatment/normalizedCounts.txt')
+  dds_file  <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/Treatment/normalizedCounts.RDS')
+  pdf_out <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/normalization.pdf')
 } else{
   args = commandArgs(trailingOnly=TRUE)
   count_file <- args[1]

@@ -19,16 +19,15 @@ library('circlize')
 library('ComplexHeatmap')
 library('EnhancedVolcano')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 if(interactive()){
   # project <- '2021612_finch'
   # test <- 'Treatment'
   # strats <- c('Euth_Age-D6', 'Euth_Age-D18','Euth_Age-D35', 'Euth_Age-D90')[1]
-  # gmt_file <- '/data/vrc_his/douek_lab/wakecg/c2.cp.v7.2.symbols.gmt'
   # species <- 'tguttata'
-  #custom_set <-  '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/Custom_sets_2022-09-13.xlsx'
+  #custom_set <-  '/home/cwake/projects/2021612_finch/Custom_sets_2022-09-13.xlsx'
   
   project <- '2022612_Petrovas'
   qc_name <- 'QC3'
@@ -36,13 +35,13 @@ if(interactive()){
   strats <- c('Cell_type-Tfh', 'Cell_type-pre_Tfh')
   species <- 'mmulatta'
   
-  de_files <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/', strats, '/DESeq2_results.txt')
-  fgsea_files <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/', strats, '/fgsea_results.txt')
-  count_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/counts/finalCounts.txt')
-  covs_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
-  gmt_file <- '/data/vrc_his/douek_lab/wakecg/genesets/c2.cp.v7.2.symbols.gmt'
-  out_pdf <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/Heatmaps.pdf')
-  pdf_dir <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/genes/')
+  de_files <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/', strats, '/DESeq2_results.txt')
+  fgsea_files <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/', strats, '/fgsea_results.txt')
+  count_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/counts/finalCounts.txt')
+  covs_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
+  gmt_file <- '/home/cwake/resources/gene_sets/c2.cp.v7.2.symbols.gmt'
+  out_pdf <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/Heatmaps.pdf')
+  pdf_dir <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/genes/')
   custom_set <- ''
 }else{
   args = commandArgs(trailingOnly=TRUE)
@@ -153,8 +152,8 @@ if(custom_set != ''){
   ### Fraction of custom set in the goal_set AFTER matching
   sum(!is.na(mat$match))/length(custom)
   
-  csv_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/Custom_sets_matches.csv')
-  xls_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/Custom_sets_matches.xls')
+  csv_file <- paste0('/home/cwake/projects/', project, '/Custom_sets_matches.csv')
+  xls_file <- paste0('/home/cwake/projects/', project, '/Custom_sets_matches.xls')
   write.table(mat, csv_file, quote = F, row.names = F)
   WriteXLS(mat, ExcelFileName = xls_file)
 }
@@ -205,7 +204,7 @@ dev.off()
 ### Volcano
 pthresh <- 0.05
 FCthresh <- 2
-pdf('/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Volcanos.pdf')
+pdf('/home/cwake/projects/2021612_finch/results/Volcanos.pdf')
 for(strat in names(de_list)){
   res <- de_list[[strat]]
   res[row.names(names_key), 'gene_name_plot'] <- names_key$gene_name_plot

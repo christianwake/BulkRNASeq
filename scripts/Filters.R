@@ -5,23 +5,23 @@ library('genefilter')
 library('data.table')
 library('scuttle')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 print(Sys.Date())
 if(interactive()){
   project <- '2021612_finch'
   qc_name <- '2023-12-06'
-  count_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/counts/featureCounts.txt')
-  covs_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/Covariates_QC_metrics.csv')
-  qc_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/QC_steps/Sample_and_feature_filters.csv')
+  count_file <- paste0('/home/cwake/projects/', project, '/data/counts/featureCounts.txt')
+  covs_file <- paste0('/home/cwake/projects/', project, '/data/Covariates_QC_metrics.csv')
+  qc_file <- paste0('/home/cwake/projects/', project, '/QC_steps/Sample_and_feature_filters.csv')
 
-  covs_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_intermediate.csv')
-  out_count <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/data/counts/filteredCounts.txt')
-  out_pdf <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/sample_filters.pdf')
-  out_txt <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/sample_filters.txt')
-  out_txt2 <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/feature_filters.txt')
-  chr_pdf <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/chr_dist.pdf')
+  covs_out <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_intermediate.csv')
+  out_count <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/data/counts/filteredCounts.txt')
+  out_pdf <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/sample_filters.pdf')
+  out_txt <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/sample_filters.txt')
+  out_txt2 <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/feature_filters.txt')
+  chr_pdf <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/chr_dist.pdf')
   
   test <- 'Treatment'
   strat <- 'Euth_Age: D6,D18,D35,D90'
@@ -32,7 +32,7 @@ if(interactive()){
   keys <- 'RIN_score;Aligned_input;Aligned_uniquely;PCA'
   values <- '<=6;3(SD);3(SD);2(SD)'
 
-  gtf_file <- '/data/vrc_his/douek_lab/reference_sets/tguttata/bTaeGut1_v1.p/Annotation/Taeniopygia_guttata.bTaeGut1_v1.p.104.gtf'
+  gtf_file <- '/home/cwake/resources/genomes/tguttata/bTaeGut1_v1.p/Annotation/Taeniopygia_guttata.bTaeGut1_v1.p.104.gtf'
 } else{
   args = commandArgs(trailingOnly=TRUE)
   count_file <- args[1]
@@ -236,6 +236,8 @@ feat_txt$N <- NA
 print('N_reads')
 small_features <- c()
 if(n_reads != ''){
+  ### Input can be 1 or 2 (comma-delimited) values. If 2, first is assumed to be lower-bound, second to be upper-bound.
+  ### Values can be numerical and be followed by a '(SD)', can be preceded by a <, >, =< or => (if only 1 input value).
   thresh <- threshold_string_dat(covs, n_reads, 'N_reads')
   if(grepl('=', n_reads)){
     small_features <- rownames(raw_counts)[rowSums(raw_counts) <= thresh[1]]
@@ -279,7 +281,7 @@ if(var_thresh != ''){
   vars <- sapply(features, function(rn) var(as.numeric(raw_counts[rn, ])))
   #vars <- vars[order(vars)]
   thresh <- threshold_string_feature(vars, var_thresh)
-  if(grepl('=', n_reads)){
+  if(grepl('=', var_thresh)){
     stable_features <- rownames(vars)[vars <= thresh[1]]
   } else{
     stable_features <- rownames(vars)[vars < thresh[1]]

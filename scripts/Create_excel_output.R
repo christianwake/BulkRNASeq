@@ -3,8 +3,8 @@ library('readr')
 library('WriteXLS')
 library('data.table')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 get_strats <- function(gs, dats, n = F){
   strats <- c()
@@ -23,23 +23,23 @@ get_strats <- function(gs, dats, n = F){
 }
 
 if(interactive()){
-  args <- c('/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment_DESeq2.xls',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment_DESeq2_sig.xls',
+  args <- c('/home/cwake/projects/2021612_finch/results/Treatment_DESeq2.xls',
+            '/home/cwake/projects/2021612_finch/results/Treatment_DESeq2_sig.xls',
             '0.05',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/All/DESeq2_results.txt',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/Euth_Age-D6/DESeq2_results.txt',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/Euth_Age-D18/DESeq2_results.txt',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/Euth_Age-D35/DESeq2_results.txt',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/Euth_Age-D90/DESeq2_results.txt')
+            '/home/cwake/projects/2021612_finch/results/Treatment/All/DESeq2_results.txt',
+            '/home/cwake/projects/2021612_finch/results/Treatment/Euth_Age-D6/DESeq2_results.txt',
+            '/home/cwake/projects/2021612_finch/results/Treatment/Euth_Age-D18/DESeq2_results.txt',
+            '/home/cwake/projects/2021612_finch/results/Treatment/Euth_Age-D35/DESeq2_results.txt',
+            '/home/cwake/projects/2021612_finch/results/Treatment/Euth_Age-D90/DESeq2_results.txt')
   
-  args <- c('/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment_GSEA.xls',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment_GSEA_sig.xls',
+  args <- c('/home/cwake/projects/2021612_finch/results/Treatment_GSEA.xls',
+            '/home/cwake/projects/2021612_finch/results/Treatment_GSEA_sig.xls',
             '0.05',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/All/fgsea_results.txt',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/Euth_Age-D6/fgsea_results.txt',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/Euth_Age-D18/fgsea_results.txt',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/Euth_Age-D35/fgsea_results.txt',
-            '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Treatment/Euth_Age-D90/fgsea_results.txt')
+            '/home/cwake/projects/2021612_finch/results/Treatment/All/fgsea_results.txt',
+            '/home/cwake/projects/2021612_finch/results/Treatment/Euth_Age-D6/fgsea_results.txt',
+            '/home/cwake/projects/2021612_finch/results/Treatment/Euth_Age-D18/fgsea_results.txt',
+            '/home/cwake/projects/2021612_finch/results/Treatment/Euth_Age-D35/fgsea_results.txt',
+            '/home/cwake/projects/2021612_finch/results/Treatment/Euth_Age-D90/fgsea_results.txt')
 
 }else{
   args = commandArgs(trailingOnly=TRUE)

@@ -5,8 +5,8 @@ library('stringr')
 library('GenomicRanges')
 library('dplyr')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 args = commandArgs(trailingOnly=TRUE)
 count_in <- args[1]
@@ -16,12 +16,12 @@ method <- args[4]
 txt_out <- args[5]
 pdf_out <- args[6]
 
-# count_in <- '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/data/counts/normalizedCounts.txt'
-# covs_in <- '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/data/Covariates_QC_metrics_filter.csv'
+# count_in <- '/home/cwake/projects/2021612_finch/data/counts/normalizedCounts.txt'
+# covs_in <- '/home/cwake/projects/2021612_finch/data/Covariates_QC_metrics_filter.csv'
 # candidates <- 'plate, RNA_Extraction_Batch'
 # method <- 'model'
-# txt_out <- '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/data/batch_evaluation.txt'
-# pdf_out <- '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/data/batch_evaluation.pdf'
+# txt_out <- '/home/cwake/projects/2021612_finch/data/batch_evaluation.txt'
+# pdf_out <- '/home/cwake/projects/2021612_finch/data/batch_evaluation.pdf'
 
 ### Analysis only done in the 'else' statement, if the user has input some candidate batch variable to evaluate. If they haven't, only output a message recommending that they do.
 if(candidates == ''){

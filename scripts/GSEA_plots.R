@@ -9,9 +9,9 @@ library('fgsea')
 library('circlize')
 library('ComplexHeatmap')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-#source('/data/vrc_his/douek_lab/snakemakes/sc_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+#source('/home/cwake/snakemakes/sc_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 if(interactive()){
   project <- '2021612_finch'
@@ -20,14 +20,14 @@ if(interactive()){
   strats_str <- 'All;Euth_Age-D6;Euth_Age-D18;Euth_Age-D35;Euth_Age-D90'
   pthresh <- '0.05'
   
-  pdf_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/DE_gene_expression.pdf')
-  gmt_file <- '/data/vrc_his/douek_lab/wakecg/genesets/c2.cp.v7.2.symbols.gmt'
+  pdf_out <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/DE_gene_expression.pdf')
+  gmt_file <- '/home/cwake/resources/gene_sets/c2.cp.v7.2.symbols.gmt'
   custom_sets <- ''
-  count_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/counts/finalCounts.txt')
-  covs_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
-  gtf_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/gtf.RDS')
-  de_files <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/', strsplit(strats_str, ';')[[1]], '/DESeq2_results.txt')
-  fgsea_files <-  paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/', strsplit(strats_str, ';')[[1]], '/fgsea_results.txt')
+  count_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/counts/finalCounts.txt')
+  covs_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
+  gtf_file <- paste0('/home/cwake/projects/', project, '/data/gtf.RDS')
+  de_files <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/', strsplit(strats_str, ';')[[1]], '/DESeq2_results.txt')
+  fgsea_files <-  paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/', strsplit(strats_str, ';')[[1]], '/fgsea_results.txt')
 }else{
   args = commandArgs(trailingOnly=TRUE)
   pdf_out <- args[1]

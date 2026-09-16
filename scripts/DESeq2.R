@@ -10,8 +10,8 @@ library('data.table')
 library('biomaRt')
 library('EnhancedVolcano')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 print(Sys.Date())
 
@@ -21,15 +21,15 @@ if(interactive()){
   qc_name <- '2024-03-08'
   test <- 'Treatment'
   adjust <- 'Sex,Euth_Age,plate'
-  gtf_file <- '/data/vrc_his/douek_lab/reference_sets/tguttata/bTaeGut1_v1.p/Annotation/Taeniopygia_guttata.bTaeGut1_v1.p.104.gtf'
+  gtf_file <- '/home/cwake/resources/genomes/tguttata/bTaeGut1_v1.p/Annotation/Taeniopygia_guttata.bTaeGut1_v1.p.104.gtf'
   stratification <- 'All'
 
-  count_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/counts/finalCounts.txt')
-  dds_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/counts/finalCounts.RDS')
-  covs_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
-  batch_info <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/batch_evaluation.txt')
-  pdf_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test,  '/', stratification, '/DESeq2_results.pdf')
-  txt_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/', stratification, '/DESeq2_results.txt')
+  count_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/counts/finalCounts.txt')
+  dds_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/counts/finalCounts.RDS')
+  covs_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
+  batch_info <- paste0('/home/cwake/projects/', project, '/data/batch_evaluation.txt')
+  pdf_out <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test,  '/', stratification, '/DESeq2_results.pdf')
+  txt_out <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/', stratification, '/DESeq2_results.txt')
 }else{
   args = commandArgs(trailingOnly=TRUE)
   count_in <- args[1]

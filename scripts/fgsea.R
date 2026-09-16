@@ -12,24 +12,24 @@ library('fgsea')
 library('GSEABase')
 library('readxl')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 print(sessionInfo())
 
 if(interactive()){
   project <- '2021612_finch'
   qc_name <- '2023-12-06'
-  custom_sets <- '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/Custom_sets_2022-09-13.xlsx'
-  res_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, 
+  custom_sets <- '/home/cwake/projects/2021612_finch/Custom_sets_2022-09-13.xlsx'
+  res_file <- paste0('/home/cwake/projects/', project, 
                      '/results/', qc_name, '/Treatment/All/DESeq2_results.txt')
   
-  count_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/counts/finalCounts.txt')
-  gtf_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/gtf.RDS')
-  gmt_file <- '/data/vrc_his/douek_lab/wakecg/genesets/c2.cp.v7.2.symbols.gmt'
+  count_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/counts/finalCounts.txt')
+  gtf_file <- paste0('/home/cwake/projects/', project, '/data/gtf.RDS')
+  gmt_file <- '/home/cwake/resources/gene_sets/c2.cp.v7.2.symbols.gmt'
   species <- 'mmulatta'
-  out_tsv <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/fgsea_Strain_allClusters.tsv')
-  out_rds <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/fgsea_Strain_allClusters.RDS')
-  out_pdf <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/Strain/Cell_type-pre_Tfh/fgsea_results.pdf')
+  out_tsv <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/fgsea_Strain_allClusters.tsv')
+  out_rds <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/fgsea_Strain_allClusters.RDS')
+  out_pdf <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/Strain/Cell_type-pre_Tfh/fgsea_results.pdf')
   #custom_sets <- NA
 } else{
   args = commandArgs(trailingOnly=TRUE)

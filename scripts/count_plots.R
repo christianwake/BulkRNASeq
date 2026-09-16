@@ -19,21 +19,21 @@ if(interactive()){
   if(region == 'genes'){
     region_desc <- 'gene_length'
   }
-  covs_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, 
+  covs_in <- paste0('/home/cwake/projects/', project, 
                     '/RRBS/SampleSheets/Sample_sheet_2024.csv')
-  annot_full <- '/data/vrc_his/douek_lab/reference_sets/tguttata/bTaeGut1_v1.p/Annotation/Taeniopygia_guttata.bTaeGut1_v1.p.111.gtf'
-  bulk_dir <- '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/2024-03-08/'
+  annot_full <- '/home/cwake/resources/genomes/tguttata/bTaeGut1_v1.p/Annotation/Taeniopygia_guttata.bTaeGut1_v1.p.111.gtf'
+  bulk_dir <- '/home/cwake/projects/2021612_finch/results/2024-03-08/'
   
-  norm_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/RRBS/results/',
+  norm_file <- paste0('/home/cwake/projects/', project, '/RRBS/results/',
                     qc_name, '/methylKit/methylKit_norm_', meth_type, '.RDS')
-  adj_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/RRBS/results/',
+  adj_file <- paste0('/home/cwake/projects/', project, '/RRBS/results/',
                     qc_name, '/methylKit/norm_batch_', meth_type, '.RDS')
-  dm_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/RRBS/results/',
+  dm_file <- paste0('/home/cwake/projects/', project, '/RRBS/results/',
                      qc_name, '/methylKit/DM_', meth_type, '_subset-', subset_name, '_region-', region, '.RData')
   
-  pdf_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/RRBS/results/',
+  pdf_file <- paste0('/home/cwake/projects/', project, '/RRBS/results/',
                      qc_name, '/Boxplots_', region_desc, '_', meth_type, '.pdf')
-  gtf_rds <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/RRBS/data/gtf.RDS')
+  gtf_rds <- paste0('/home/cwake/projects/', project, '/RRBS/data/gtf.RDS')
   
 }else{
   args = commandArgs(trailingOnly=TRUE)

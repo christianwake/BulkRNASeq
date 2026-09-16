@@ -10,8 +10,8 @@ library('ComplexHeatmap')
 #library('pheatmap')
 library('RColorBrewer')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
 
 if(interactive()){
   project <- '2021612_finch'
@@ -20,11 +20,11 @@ if(interactive()){
   pthresh <- '0.05'
   strats_str <- 'All;Euth_Age-D6;Euth_Age-D18;Euth_Age-D35;Euth_Age-D90'
   
-  pdf_out <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, 'DE2.pdf')
-  count_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/counts/finalCounts.txt')
-  covs_in <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
-  gtf_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/data/gtf.RDS')
-  de_files <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, '/results/', qc_name, '/', test, '/', strsplit(strats_str, ';')[[1]], '/DESeq2_results.txt')
+  pdf_out <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, 'DE2.pdf')
+  count_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/counts/finalCounts.txt')
+  covs_in <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/QC/Covariates_QC_metrics_filter.csv')
+  gtf_file <- paste0('/home/cwake/projects/', project, '/data/gtf.RDS')
+  de_files <- paste0('/home/cwake/projects/', project, '/results/', qc_name, '/', test, '/', strsplit(strats_str, ';')[[1]], '/DESeq2_results.txt')
   
 }else{
   args = commandArgs(trailingOnly=TRUE)

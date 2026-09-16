@@ -9,18 +9,18 @@ library('data.table')
 library('tools')
 library('readxl')
 library('tools')
-source('/data/vrc_his/douek_lab/wakecg/sample_sheet_functions.R')
-#source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/sample_sheet_functions.R')
+#source('/home/cwake/snakemakes/Utility_functions.R')
 
 if(interactive()){
   project <- '2021612_finch'
   investigator <- 'Rachel_Davis'
   reference <- 'tguttata'
-  run_path <- '/data/vrc_his/douek_lab/Runs/'
-  csv_file <- paste0('/data/vrc_his/douek_lab/projects/RNASeq/', project, 
+  run_path <- '/home/cwake/data/'
+  csv_file <- paste0('/home/cwake/projects/', project, 
                      '/SampleSheets/Sample_sheet.csv')
   ## bcl2fastq sample sheets from excel docs
-  #excel_file <- '/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/RD_TLbulkrnaseq_052721.xlsx'
+  #excel_file <- '/home/cwake/projects/2021612_finch/RD_TLbulkrnaseq_052721.xlsx'
 }else{
   args = commandArgs(trailingOnly=TRUE)
   project <- args[1]
