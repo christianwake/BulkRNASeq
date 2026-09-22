@@ -4,6 +4,7 @@ import pandas as pd
 import subprocess
 import os
 from collections import defaultdict
+from difflib import SequenceMatcher
 
 configfile: 'project_config_file.yaml'
 localrules: aggregate_fastqc, aggregate_bams, aggregate_rseqc
@@ -46,23 +47,47 @@ size_step = [8000,15000,64000, 240000]
 def get_mem_mb(wildcards, attempt):
   return size_step[attempt]
 
-### Required columns in sample_sheet are: Sample_Name, S_N, Lane, 
-### List of fastq files
-samples['R1'] = samples['Sample_Name'].map(str) + '_' + samples['S_N'].map(str) + '_L00' + samples['Lane'].map(str) + '_R1_001'
-samples['R2'] = samples['Sample_Name'].map(str) + '_' + samples['S_N'].map(str) + '_L00' + samples['Lane'].map(str) + '_R2_001'
-samples['samp'] = samples['Sample_Name'].map(str) + '_' + samples['S_N'].map(str) + '_L00' + samples['Lane'].map(str)
-#samples['R1'] = samples['Sample_Name'].map(str) + '_' + samples['Sample_ID'].map(str) + '_L00' + samples['Lane'].map(str) + '_R1_001'
-#samples['R2'] = samples['Sample_Name'].map(str) + '_' + samples['Sample_ID'].map(str) + '_L00' + samples['Lane'].map(str) + '_R2_001'
-#samples['samp'] = samples['Sample_Name'].map(str) + '_' + samples['Sample_ID'].map(str) + '_L00' + samples['Lane'].map(str)
-samples['R1_fullpath'] = list([os.path.join(config['runs_dir'], samples.FC_Name[i], 'demultiplexed', config['project'], samples['Sample_ID'][i], samples['R1'][i] + '.fastq.gz') for i in range(0,len(samples['R1']))])
-samples['R2_fullpath'] = list([os.path.join(config['runs_dir'], samples.FC_Name[i], 'demultiplexed', config['project'], samples['Sample_ID'][i], samples['R2'][i] + '.fastq.gz') for i in range(0,len(samples['R2']))])
-runs_fastqs = list(samples['R1_fullpath']) + list(samples['R2_fullpath'])
-samples['R1_projpath'] = list([os.path.join('data', 'fastq', 'raw', samples['R1'][i] + '.fastq.gz') for i in range(0,len(samples['R1']))])
-samples['R2_projpath'] = list([os.path.join('data', 'fastq', 'raw', samples['R2'][i] + '.fastq.gz') for i in range(0,len(samples['R2']))])
-proj_fastqs = list(samples['R1_projpath']) + list(samples['R2_projpath'])
-samples['R1_subdir'] = list([os.path.join(samples['Sample_ID'][i], samples['R1'][i] + '.fastq.gz') for i in range(0,len(samples['R1']))])
-samples['R2_subdir'] = list([os.path.join(samples['Sample_ID'][i], samples['R2'][i] + '.fastq.gz') for i in range(0,len(samples['R2']))])
-fastq_files = list(samples['R1']) + list(samples['R2'])
+#def get_longest_match(samples, i):
+#  match = SequenceMatcher(None, samples['R1_basename'][i], samples['R2_basename'][i]).find_longest_match()
+#  return(samples['R1_basename'][i][match.b:match.b + match.size])
+
+### Items cannot be numeric
+def file_structure_formatting(template, samples, i):
+  ### Dictionary of row i's values with column names as keys
+  sample_dict = dict(zip(list(samples.columns), list(samples.iloc[i])))
+  return template.format(**sample_dict)
+
+##### Fastq file path management
+raw_file_source = config['raw_file_source'].lower().replace('_', ' ')
+### If input file structuer is 'sample sheet'
+if raw_file_source == 'sample sheet':
+  ### If the raw data full paths are entered in the sample files
+  if 'R1_data_fastq' in samples.columns and 'R2_data_fastq' in samples.columns:
+    print('Sample sheet!')
+    data_fastqs = list(samples['R1_data_fastq']) + list(samples['R2_data_fastq'])
+elif raw_file_source == 'custom':
+  ### Note- NIAIDs data would be '/home/cwake/data/{FC_name}/demultiplexed/{project}/{Sample_ID}/{Sample_Name}_{S_N}_L00{Lane}_R1_001.fastq.gz'
+  template = config['raw_file_structure']
+  samples['R1_data_fastq'] = list([file_structure_formatting(template, samples, i) for i in range(0,len(samples['Sample_Name']))])
+  samples['R2_data_fastq'] = list([x.replace('_R1', '_R2') for x in samples['R1_data_fastq']])
+  data_fastqs = list(samples['R1_data_fastq']) + list(samples['R2_data_fastq'])
+
+
+### Get the basenames without extensions (remove gz first, then a generic extension probably fq or fastq)
+samples['R1_basename'] = list([os.path.splitext(os.path.basename(samples['R1_data_fastq'][i]).removesuffix('.gz'))[0] for i in range(0, len(samples['Sample_Name']))])
+samples['R2_basename'] = list([os.path.splitext(os.path.basename(samples['R2_data_fastq'][i]).removesuffix('.gz'))[0] for i in range(0, len(samples['Sample_Name']))])
+fastq_basenames = list(samples['R1_basename']) + list(samples['R2_basename'])
+### Get the sample name (excluding R1 or R2) from the file name. Assumes format '_R1_' just before file extension
+samples['samp'] = list(samples['R1_basename'][i].split('_R1_')[0] for i in range(0, len(samples['Sample_Name'])))
+
+#### Required info going forward
+### 'samp' column in samples, containing sample file fastq names without path, without extension and without R number info. Used in rules aggregate_bams, aggregate_RSeQC and run_featurecounts.
+### fastq_basenames list containing all fastq file names without path and without extension. Used in rules aggregate_fastq and aggregate_fastqc
+### data_fastqs list containing all fastq files full original data directory. Used in rule cp_fastq_to_project_dir
+print(fastq_basenames)
+def get_data_fq_from_proj_fq(wildcards):
+  return proj_fq_to_data_fq[wildcards.fastq]
+proj_fq_to_data_fq = dict(zip(fastq_basenames, data_fastqs))
 
 ### List of test variable names from the configuration file
 tests = [x.strip() for x in config['test'].split(',')]
@@ -75,9 +100,6 @@ if(len(strats) > 1):
   strat_list = strat_list + [strats[0] + '-' + v.strip() for v in strats[1].split(',')]
 print('Stratifications: ')
 print(strat_list)
-
-def get_test_txt(wildcards):
-  return [os.path.join('test/', ID + '_test.txt') for ID in list(samples[samples['FC_Name'] == wildcards.FC].Sample_ID)]
 
 refbed = config['refbed']
 if config['refbed'] == '':
@@ -92,25 +114,33 @@ rule all:
     [results_dir + "{test}_GSEA.pdf".format(test = test) for test in tests],
     [results_dir + "{test}_DE.pdf".format(test = test) for test in tests]
 
-print(runs_fastqs)
 ### FCs is a list
-rule aggregate_fc_and_copy_to_project:
-  input:  ### ancient is required though not ideal, because 'cat' apparently modifies the timestamp of the inputs :(
-    ancient([os.path.join(config['runs_dir'], FC, "raw_fastq_files.txt") for FC in list(flowcells.keys())])
-  output:
-    #'data/fastq/raw/copy_fastqs.sh'
-    proj_fastqs
-  params:
-    sh_file = 'data/fastq/raw/copy_fastqs.sh'
-  shell:  ### Remove it in case in exists, then create and run an sh file that copies raw fastq files from runs directory to project's data directory
-    """
-    mkdir -p data/fastq/raw/
-    rm -f {params.sh_file}
-    cat {input} > {params.sh_file}
-    sed -i 's/^/cp /' {params.sh_file}
-    sed -i 's/$/ data\/fastq\/raw\/ /' {params.sh_file}
-    sh {params.sh_file}
-    """
+#rule aggregate_fc_and_copy_to_project:
+#  input:  ### ancient is required though not ideal, because 'cat' apparently modifies the timestamp of the inputs :(
+#    ancient([os.path.join(config['data_dir'], FC, "raw_fastq_files.txt") for FC in list(flowcells.keys())])
+#  output:
+#    #'data/fastq/raw/copy_fastqs.sh'
+#    proj_fastqs
+#  params:
+#    sh_file = 'data/fastq/raw/copy_fastqs.sh'
+#  shell:  ### Remove it in case in exists, then create and run an sh file that copies raw fastq files from data directory to project's data directory
+#    """
+#    mkdir -p data/fastq/raw/
+#    rm -f {params.sh_file}
+#    cat {input} > {params.sh_file}
+#    sed -i 's/^/cp /' {params.sh_file}
+#    sed -i 's/$/ data\/fastq\/raw\/ /' {params.sh_file}
+#    sh {params.sh_file}
+#    """
+
+rule cp_fastq_to_project_dir:
+  input:
+    ### Requires wildcard "fastq" and returns the full path of the R1 fastq, data path
+    get_data_fq_from_proj_fq
+  output: ### wildcard values are in fastq_basenames
+    temp("data/fastq/raw/{fastq}.fastq.gz")
+  shell:
+    "cp {input} {output}"
 
 rule run_fastqc_once:
   input:
@@ -123,7 +153,7 @@ rule run_fastqc_once:
 ### wildcard sdir cannot go in the expand function with the non-wildcard fastq
 rule aggregate_fastqc:
   input:
-    ["data/fastq/{sdir}/fastqc/" + second for second in expand("{fastq}_fastqc.zip", fastq = fastq_files)]
+    ["data/fastq/{sdir}/fastqc/" + second for second in expand("{fastq}_fastqc.zip", fastq = fastq_basenames)]
   output:
     "data/fastq/{sdir}/multiqc_input_files.txt"
   shell:
@@ -131,7 +161,7 @@ rule aggregate_fastqc:
 
 rule aggregate_fastq:
   input:
-    ["data/fastq/{sdir}/" + second for second in expand("{fastq}.fastq.gz", fastq = fastq_files)]
+    ["data/fastq/{sdir}/" + second for second in expand("{fastq}.fastq.gz", fastq = fastq_basenames)]
   output:
     "data/fastq/{sdir}/file_list.txt"
   shell:
@@ -491,6 +521,7 @@ rule Evaluate_batch:
     """
 
 rule ComBat:
+### 'samp' colum in samples, containing fastq file names without path, without extension and without R number info. Used in :
   input:
     results_dir + 'counts/normalizedCounts.txt',
     results_dir + 'counts/normalizedCounts.RDS',
