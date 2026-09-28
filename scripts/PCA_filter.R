@@ -1,4 +1,4 @@
-library('sys')
+#library('sys')
 library('DESeq2')
 library('ggplot2')
 library('stringr')
@@ -7,7 +7,7 @@ library('dplyr')
 library('ggrepel')
 
 source('/home/cwake/snakemakes/Utility_functions.R')
-source('/home/cwake/snakemakes/DE_functions.R')
+#source('/home/cwake/snakemakes/DE_functions.R')
 
 if(interactive()){
   project <- '2021612_finch'

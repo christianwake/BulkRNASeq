@@ -1,8 +1,8 @@
-library('sys')
+#library('sys')
 library('DESeq2')
 library('ggplot2')
-library('stringr')
-library('GenomicRanges')
+#library('stringr')
+#library('GenomicRanges')
 library('dplyr')
 
 source('/home/cwake/snakemakes/Utility_functions.R')

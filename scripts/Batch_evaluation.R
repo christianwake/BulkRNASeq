@@ -1,12 +1,12 @@
-library('sys')
+#library('sys')
 library('DESeq2')
 library('ggplot2')
-library('stringr')
-library('GenomicRanges')
+#library('stringr')
+#library('GenomicRanges')
 library('dplyr')
 
 source('/home/cwake/snakemakes/Utility_functions.R')
-source('/home/cwake/snakemakes/DE_functions.R')
+#source('/home/cwake/snakemakes/DE_functions.R')
 
 args = commandArgs(trailingOnly=TRUE)
 count_in <- args[1]

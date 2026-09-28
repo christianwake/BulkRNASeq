@@ -1,6 +1,6 @@
 
-library('qqman')
-library('stats')
+#library('qqman')
+#library('stats')
 library('ggplot2')
 library('methylKit')
 library('genomation')
