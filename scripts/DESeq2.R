@@ -165,10 +165,8 @@ if(gtf_file == '' | is.na(gtf_file)){
     gtf <- readRDS(gtf_file)
   }
   row.names(gtf) <- gtf$gene_id
-  ### Determine whether 'gene_name' or 'gene_id' better matches those in the seurat object
-  gtf_cols <- c('gene_name', 'gene_id')
-  #id_type <- names(which.max(sapply(gtf_cols, function(col) sum(row.names(norm_counts) %in% gtf[, col]))))
-  id_type <- get_id_name(row.names(norm_counts), gtf)
+  ### Determine whether 'gene_name' or 'gene_id' better matches those in the counts object
+  #id_type <- get_id_name(row.names(norm_counts), gtf)
 }
 res[, 'gene_name_gtf'] <- gtf[row.names(res), 'gene_name']
 

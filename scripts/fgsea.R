@@ -7,13 +7,16 @@ library('dplyr')
 library('readr')
 library('effsize')
 library('data.table')
-library('biomaRt')
+#library('biomaRt')
 library('fgsea')
 library('GSEABase')
 library('readxl')
 
-source('/data/vrc_his/douek_lab/snakemakes/Utility_functions.R')
-source('/data/vrc_his/douek_lab/snakemakes/DE_functions.R')
+source('/home/cwake/snakemakes/Utility_functions.R')
+source('/home/cwake/snakemakes/DE_functions.R')
+#source('C:/Users/cwake/Documents/Code/GitHub/Utility_functions.R')
+#source('C:/Users/cwake/Documents/Code/GitHub/DE_functions.R')
+
 print(sessionInfo())
 
 if(interactive()){
@@ -38,10 +41,11 @@ if(interactive()){
   gtf_file <- args[3]
   gmt_file <- args[4]
   species <- args[5]
-  out_tsv <- args[6]
-  out_rds <- args[7]
-  out_pdf <- args[8]
-  custom_sets <- args[9]
+  de_test <- args[6]
+  out_tsv <- args[7]
+  out_rds <- args[8]
+  out_pdf <- args[9]
+  custom_sets <- args[10]
 }
 
 minSize <- 5
@@ -55,96 +59,34 @@ norm_counts <- read.csv(count_in, stringsAsFactors=F, header = T,
 norm_counts <- mutate_all(norm_counts, function(x) as.numeric(x))
 ### Read DE results
 res <- read.table(res_file, header = T, check.names = F, stringsAsFactors = F, na.strings = c("", "NA"), sep = '\t')
-### Run biomaRt to get gene name information from ensembl IDs.
-res$ensembl <- row.names(res)
-#colnames(res) <- gsub('gene_name', 'gene_name_gtf', colnames(res))
 
-print('Reading gtf file')
-print(gtf_file)
-if(gtf_file == '' | is.na(gtf_file)){
-  gtf <- NA
+### Read gtf
+if(grepl('\\.gtf', gtf_file)){
+  gtf <- read_gtf(gtf_file, feature_type = 'gene', atts_of_interest = c('gene_id', 'gene_name',  'gene_biotype'))
+} else if(grepl('\\.RDS', gtf_file)){
+  gtf <- readRDS(gtf_file)
 } else{
-  if(grepl('\\.gtf', gtf_file)){
-    gtf <- read_gtf(gtf_file, 'gene', c('gene_name', 'gene_id')) 
-  } else{
-    gtf <- readRDS(gtf_file)
-  }
-  row.names(gtf) <- gtf$gene_id
-  ### Determine whether 'gene_name' or 'gene_id' better matches those in the seurat object
-  gtf_cols <- c('gene_name', 'gene_id')
-  #id_type <- names(which.max(sapply(gtf_cols, function(col) sum(row.names(raw_counts) %in% gtf[, col]))))
-  id_type <- get_id_name(row.names(norm_counts), gtf)
+  warning('No gtf file')
 }
-### Determine whether each is a gene ID or name
-all_names <- sapply(row.names(res), function(x) get_id_name(x, gtf))
-names(all_names) <- row.names(res)
-table(all_names)
-### For each gene name or ID, if it is a gene name, use it. If not, get the IDs gene name match from gtf, or just the ID if there is none
-res$gene_name <- sapply(1:length(all_names), function(i) ifelse(all_names[i] == 'gene_name', 
-                                               names(all_names)[i], 
-                                               ifelse(is.na(gtf[names(all_names)[i], 'gene_name']),
-                                                      names(all_names)[i],gtf[names(all_names)[i], 'gene_name'])))
-res$gene_name_gtf <- sapply(1:length(all_names), function(i) ifelse(all_names[i] == 'gene_name', 
-                                                                names(all_names)[i], 
-                                                                gtf[names(all_names)[i], 'gene_name']))
-id_key <- res[, 'gene_name', drop= F]
+row.names(gtf) <- gtf$gene_id
 
-# if(species != 'hsapiens'){
-#   ### BiomaRt, for gene names
-#   id_key <- run_biomaRt(res, to_merge = F, species = species)
-#   ### (For now) Only keep one-to-one orthologs.
-#   id_key <- id_key[which(id_key$ortholog_type == 'ortholog_one2one'),]
-#   id_key[id_key == ''] <- NA
-#   row.names(id_key) <- id_key$ens_short
-#   colSums(is.na(id_key))
-#   ### Prioritize Gene names from biomart human orthologs
-#   res[row.names(id_key), 'gene_name'] <- id_key$gene_name
-#   ### But when that is NA, use gene name from the other species' gtf
-#   res[which(is.na(res$gene_name) & !is.na(res$gene_name_gtf)), 'gene_name'] <- res[which(is.na(res$gene_name) & !is.na(res$gene_name_gtf)), 'gene_name_gtf']
-#   res[, 'gene_name_plot'] <- res$gene_name
-#   res[which(is.na(res$gene_name)), 'gene_name_plot'] <- row.names(res[which(is.na(res$gene_name)), ])
-#   ### Adjust it if there are duplicates in 'gene_name_plot'
-#   dups <- names(table(res$gene_name_plot))[which(table(res$gene_name_plot) > 1)]
-#   res[which(res$gene_name_plot %in% dups), 'gene_name_plot'] <- 
-#     paste0(res[which(res$gene_name_plot %in% dups), 'gene_name_plot'], '(', row.names(res[which(res$gene_name_plot %in% dups), ]), ')')
-#   
-# } else{
-#   res$gene_name <- res$gene_name_gtf
-# }
+### If gene_name_gtf doesn't exist, add it and (if species != hsapiens) use biomaRt to find human orthologs.
+### Then add gene_name_plot.
+res <- expand_gene_names(res, species, gtf)
 
 ### Remove those without gene name annotation
 res <- res[which(!(is.na(res$gene_name))),] 
 dup_names <- names(table(res$gene_name))[which(table(res$gene_name) != 1)]
-res <- res[which(!res$gene_name %in% dup_names),]
-#rnk <- deseqRes2Rnk(res, by = '-log(p)', id = 'gene_name')
-#rnk <- rnk[order(rnk$NegLogP, decreasing = T),]
-#ranks <- setNames(rnk[, 'NegLogP'], rnk$ID)
-rnk <- deseqRes2Rnk(res, by = 'stat', id = 'gene_name')
-rnk <- rnk[order(rnk$stat, decreasing = T),]
-ranks <- setNames(rnk[, 'stat'], rnk$ID)
+res <- res[which(!res$gene_name %in% dup_names), ]
+
+### Returns a named vector of gene-level stats. Names should be the same as in 'pathways' input to fgsea
+ranks  <- get_rank(res, de_test)
 
 ### Gene sets
 genesets <- getGmt(gmt_file)
 DB <- gmtPathways(gmt_file)
-### Custom sets
-goal_set <- res$gene_name_gtf[!is.na(res$gene_name_gtf)]
-greeks <- c('Α', 'Β', 'Ε', 'Γ', 'Κ')
-
-if(custom_sets != '' & !is.na(custom_sets)){
-  sheets <- excel_sheets(path = custom_sets)
-  ### Do Biomart all at once and save it, because it often has connection issues and will fail, so this simplifies that.
-  biomart_file <- gsub('.xlsx', '.RDS', custom_sets)
-  if(!file.exists(biomart_file)){
-    biomart_custom_geneset(custom_sets, sheets, goal_set, biomart_file)
-  }
-  ### When biomart is NA, it runs biomaRt_aliases(cust) to get it. 
-  ### When biomart is an RDS file, it simply reads it
-  cus <- lapply(sheets, function(set_name) get_custom_geneset(
-    custom_sets, set_name, goal_set, res, biomart = biomart_file)[['genes']])
-  names(cus) <- sheets
-  ### Add custom sets to the DB object
-  DB <- c(DB, cus)
-} 
+### Uses text processing and biomaRt to best match genes in custom_sets and res, then adds those custom sets to DB for use in fgsea
+DB <- custom_gene_set_to_biomart_wrapper(DB, custom_sets, res)
 
 ### Genes from all  gene sets
 #genes <- unique(unlist(lapply(genesets, function(x) geneIds(x))))
@@ -152,10 +94,9 @@ genes <- unique(unlist(DB))
 
 ### Mitigate sample source bias by making sure that we only have genes with at least one count
 a_ids <- row.names(norm_counts)[which(rowSums(norm_counts) > 0)]
-a_names <- id_key[a_ids, 'gene_name']
+a_names <- res[a_ids, 'gene_name']
 a_names <- a_names[which(!is.na(a_names))]
-
-#paste0('Of ', length(a_ids), ' ids, ', length(a_names), ' are in ', species, '-human biomaRt, and ', sum(a_names %in% genes), ' of those are in human C2CP.')
+paste0('Of ', length(a_ids), ' ids, ', length(a_names), ' are in ', species, '-human biomaRt, and ', sum(a_names %in% genes), ' of those are in human C2CP.')
 
 #DB <- DB[grepl('BIOCARTA', names(DB))]
 # redundancy <- unlist(fgseaRes[which(fgseaRes$pathway %in% c('BIOCARTA_P38MAPK_PATHWAY', 'BIOCARTA_TCR_PATHWAY')), 'leadingEdge'])

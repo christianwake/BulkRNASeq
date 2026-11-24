@@ -635,7 +635,7 @@ rule GSEA:
     results_dir + '{test}/{strat}/fgsea_results.RDS',
     results_dir + '{test}/{strat}/fgsea_results.pdf'
   shell:
-    "Rscript {params.scripts}/fgsea.R {input} '{params.gmt}' '{params.species}' {output} {params.custom_sets}"
+    "Rscript {params.scripts}/fgsea.R {input} '{params.gmt}' '{params.species}' 'DESEq2' {output} {params.custom_sets}"
 
 rule GSEA_plots:
   input:

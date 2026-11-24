@@ -110,33 +110,17 @@ names(fgsea) <- strats
 fgsea_sig <- lapply(1:length(fgsea), function(i) fgsea[[i]][which(fgsea[[i]]$padj < pthresh), 'pathway'])
 names(fgsea_sig) <- strats
 
-names_key <- de_list[[1]]
+res <- de_list[[1]]
 ### Biomart species conversion
-if(species != 'hsapiens'){
-  ### BiomaRt, for gene names
-  id_key <- run_biomaRt(names_key, to_merge = F, species = species)
-  ### (For now) Only keep one-to-one orthologs.
-  id_key <- id_key[which(id_key$ortholog_type == 'ortholog_one2one'),]
-  id_key[id_key == ''] <- NA
-  row.names(id_key) <- id_key$ens_short
-  colSums(is.na(id_key))
-  ### Prioritize Gene names from biomart human orthologs
-  names_key[row.names(id_key), 'gene_name'] <- id_key$gene_name
-  ### But when that is NA, use gene name from the other species' gtf
-  names_key[which(is.na(names_key$gene_name) & !is.na(names_key$gene_name_gtf)), 'gene_name'] <- names_key[which(is.na(names_key$gene_name) & !is.na(names_key$gene_name_gtf)), 'gene_name_gtf']
-  names_key[, 'gene_name_plot'] <- names_key$gene_name
-  names_key[which(is.na(names_key$gene_name)), 'gene_name_plot'] <- row.names(names_key[which(is.na(names_key$gene_name)), ])
-  ### Adjust it if there are duplicates in 'gene_name_plot'
-  dups <- names(table(names_key$gene_name_plot))[which(table(names_key$gene_name_plot) > 1)]
-  names_key[which(names_key$gene_name_plot %in% dups), 'gene_name_plot'] <- 
-    paste0(names_key[which(names_key$gene_name_plot %in% dups), 'gene_name_plot'], '(', row.names(names_key[which(names_key$gene_name_plot %in% dups), ]), ')')
-} else{
-  names_key$gene_name <- names_key$gene_name_gtf
+if(!all( c('gene_name', 'gene_name_gtf', 'gene_name_plot') %in% colnames(res))){
+  ### If gene_name_gtf doesn't exist, add it and (if species != hsapiens) use biomaRt to find human orthologs.
+  ### Then add gene_name_plot.
+  res <- expand_gene_names(res, species, gtf) ### gtf isn't read into this script, but the conditional shouldn't be met.
 }
-names_key <- names_key[, c('gene_name', 'gene_name_gtf', 'gene_name_plot')]
+res <- res[, c('gene_name', 'gene_name_gtf', 'gene_name_plot')]
 
 ### Set of genes from the analysis (originally probably ensembl)
-goal_set <- names_key$gene_name_gtf[!is.na(names_key$gene_name_gtf)]
+goal_set <- res$gene_name_gtf[!is.na(res$gene_name_gtf)]
 
 if(custom_set != ''){
   ### Read excel file in format - sheet per main category, column per subcatory, rows of variable lengths, genes
@@ -169,9 +153,9 @@ geneset_names <- c('REACTOME_MUSCLE_CONTRACTION', 'KEGG_RIBOSOME')
 #geneset_names <- c('REACTOME_DNA_METHYLATION', "WP_METHYLATION_PATHWAYS", 'REACTOME_PRC2_METHYLATES_HISTONES_AND_DNA', 'BIOCARTA_BCR_PATHWAY', 'REACTOME_DNA_DAMAGE_TELOMERE_STRESS_INDUCED_SENESCENCE')
 for(geneset_name in geneset_names){
   genes <- DB[[geneset_name]]
-  genes <- genes[which(genes %in% names_key$gene_name_plot)]
+  genes <- genes[which(genes %in% res$gene_name_plot)]
   heatmap_title <- paste0(geneset_name, '\n(', length(genes), ' of ', length(DB[[geneset_name]]), ' genes)')
-  names(genes) <- sapply(genes, function(x) row.names(names_key[which(names_key$gene_name_plot == x),]))
+  names(genes) <- sapply(genes, function(x) row.names(res[which(res$gene_name_plot == x),]))
   print(length(genes) / length(DB[[geneset_name]]))
   ### fgsea
   if(geneset_name %in% fgsea[[1]]$pathway){
@@ -189,7 +173,7 @@ dev.off()
 sheets <- excel_sheets(path = custom_set)
 ### For each sheet in the excel file
 for(set_name in sheets){
-  set1 <- get_custom_geneset(custom_set, set_name, goal_set, names_key, biomart)
+  set1 <- get_custom_geneset(custom_set, set_name, goal_set, res, biomart)
   plot_title <- paste0(set_name, '\n(', length(set1[['genes']]), ' of ',  length(unique(read_custom_set(custom_set, set_name))), ' genes)')
   ### fgsea
   if(set_name %in% fgsea[[1]]$pathway){
@@ -208,7 +192,7 @@ FCthresh <- 2
 pdf('/data/vrc_his/douek_lab/projects/RNASeq/2021612_finch/results/Volcanos.pdf')
 for(strat in names(de_list)){
   res <- de_list[[strat]]
-  res[row.names(names_key), 'gene_name_plot'] <- names_key$gene_name_plot
+  res[row.names(res), 'gene_name_plot'] <- res$gene_name_plot
   selectLab <- res[which(res$padj <= pthresh & abs(res$log2FoldChange) >= FCthresh & !grepl('^ENSTGUG', res$gene_name_plot)), 'gene_name_plot']
   p <- EnhancedVolcano(res,
                   lab = res[,'gene_name_plot'],
